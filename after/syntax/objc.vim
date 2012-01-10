@@ -13,6 +13,13 @@ syn match objcDirective '@synthesize\|@property\|@optional\|@required' display
 syn keyword objcType IBOutlet IBAction Method
 syn keyword objcConstant YES NO TRUE FALSE
 
+syn match parens /[(){}]/
+syn match braces /[\[\]]/
+syn match ops "[-&|+<>=*!~\;:]"
+"syn match atdec '@[[:alnum:]]*'
+
+syn match objcVarDeclType '\v\k+\s*\*'
+
 syn region objcImp start='@implementation' end='@end' transparent
 syn region objcHeader start='@interface' end='@end' transparent
 
@@ -29,12 +36,13 @@ syn match objcMethodArg ')\@<=\s*\k\+' contained containedin=objcMethod
 " Matches "foo:" & "and:" in above
 syn match objcMethodName '\(^\s*[-+]\s*(\_[^)]*)\)\@<=\_\s*\_\k\+' contained containedin=objcMethod
 syn match objcMethodColon '\k\+\s*:' contained containedin=objcMethod
-syn match objcMethodParens /[(){}]/ contained containedin=objcMethod
+syn region objcMethodType start='(' end=')' contained containedin=objcMethod
+syn match objcMethodTypeName '\v\k+\s*\*?' contained containedin=objcMethodType
 
 " Don't match these groups in cParen "(...)"
 syn cluster cParenGroup add=objcMethodName,objcMethodArg,objcMethodColon
 " This fixes a bug with completion inside parens (e.g. if ([NSString ]))
-syn cluster cParenGroup remove=objcMessage
+"syn cluster cParenGroup remove=objcMessage
 
 " Matches "bar" in "[NSObject bar]" or "bar" in "[[NSObject foo: baz] bar]",
 " but NOT "bar" in "[NSObject foo: bar]".
@@ -45,17 +53,26 @@ syn match objcMessageColon '\(\_\S\+\_\s\+\)\@<=\k\+\s*:' display
 " Don't match these in this strange group for edge cases...
 syn cluster cMultiGroup add=objcMessageColon,objcMessageName,objcMethodName,objcMethodArg,objcMethodColon
 
+
 " You may want to customize this one. I couldn't find a default group to suit
 " it, but you can modify your colorscheme to make this a different color.
-hi link objcMethodName Identifier
-hi link objcMethodColon objcMethodName
+hi link objcMethodName Function
+hi link objcMethodColon Function
 
 "hi link objcMethodArg Identifier
 
-hi link objcMessageName objcMethodName
-hi link objcMessageColon objcMessageName
+hi link objcMessageName objcMessageColon
+hi link objcMessageColon objcMethodColon
 
 hi link objcSubclass objcMethodName
 hi link objcSuperclass String
 
 hi link objcError Error
+hi link objcMethodTypeName Type
+hi link objcMethodType parens
+
+hi link objcVarDeclType Type
+
+hi link parens Delimiter
+hi link braces Delimiter
+hi link ops Operator
